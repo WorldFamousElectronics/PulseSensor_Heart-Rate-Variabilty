@@ -188,7 +188,7 @@ if(showWave){
  noFill();
  stroke(250,0,0);                                       // use red for the pulse wave
   beginShape();                                         // beginShape is a nice way to draw graphs!
-  for (int i=1; i<PPG.length-1; i++){                   // scroll through the PPG array
+  for (int i=1; i<PPG.length; i++){                   // scroll through the PPG array
     float x = width-160+i;
     float y = PPG[i];
     vertex(x,y);                                        // set the vertex coordinates
@@ -217,7 +217,6 @@ void drawDataWindows(){
   fill(eggshell);
   rect(width/2-50,height/2+15,windowWidth,windowHeight);     // draw IBI data window
   rect(width-85,(height/2)+15,150,550);                      // draw the pulse waveform window
-
 }
 
 void writeAxisLabels(){

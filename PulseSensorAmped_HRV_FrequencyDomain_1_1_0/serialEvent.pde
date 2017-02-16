@@ -15,7 +15,7 @@ try{
      }
       // new data enters on the right at pulseY.length-1
       // scale and constrain incoming Pulse Sensor value to fit inside the pulse window
-      PPG[PPG.length-1] = int(map(newPPG,50,950,(height/2+15)+225,(height/2+15)-225));
+      PPG[PPG.length-1] = int(map(newPPG,0,1023,(height/2+15)+250,(height/2+15)-250));
      return;
    }
 
