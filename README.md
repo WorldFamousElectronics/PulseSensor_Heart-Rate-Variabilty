@@ -1,7 +1,7 @@
 ![logo](https://avatars0.githubusercontent.com/u/7002937?v=3&s=200)
 
 
-## <a href="https://processing.org"> Processing</a> Visualization & <a href="http://www.pulsesensor.com">PulseSensor</a>
+## <a href="https://processing.org"> Processing</a> HRV (Heart Rate Variability & <a href="http://www.pulsesensor.com">PulseSensor</a>
 
 This repo contains Processing Sketches that explore Heart Rate Variability (HRV).
 
