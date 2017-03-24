@@ -1,3 +1,8 @@
+![logo](https://avatars0.githubusercontent.com/u/7002937?v=3&s=200)
+
+
+## <a href="https://processing.org"> Processing</a> Visualization & <a href="http://www.pulsesensor.com">PulseSensor</a>
+
 This repo contains Processing Sketches that explore Heart Rate Variability (HRV).
 
 These sketches work with Arduino running PulseSensor_Amped v1.5.0 code and plugged into PulseSensor hardware.
