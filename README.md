@@ -7,9 +7,11 @@ This repo contains Processing Sketches that explore Heart Rate Variability (HRV)
 
 These sketches work with Arduino running PulseSensor_Amped v1.5.0 code and plugged into PulseSensor hardware.
 
-A thorough description of HRV and explication of these sketches is here
+*  A thorough description of HRV and explication of these sketches is here
 http://pulsesensor.com/pages/hrv-poincare-plot
-here
+
+*  here
 http://pulsesensor.com/pages/hrv-time-domain
-and here
+
+*  and here
 http://pulsesensor.com/pages/hrv-freqeuncy-domain
