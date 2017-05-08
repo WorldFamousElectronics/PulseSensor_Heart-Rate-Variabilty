@@ -52,12 +52,11 @@ void keyPressed(){
    case 'S':
      saveFrame("HRV-####.jpg");      // take a shot of that!
      break;
- // clear the IBI data array by pressing c key
-  case 'C':
-    for (int i=beatTime.length-1; i>=0; i--){  // reset the data array to default value
-       beatTime[i] = 1000;
-     }
-     break;
+ // clear the screen when you press 'R' or 'r'
+  case 'r':
+  case 'R':
+    resetDataTraces();
+    break;
    default:
      break;
  }

@@ -38,22 +38,18 @@ int numPorts = serialPorts.length;
 boolean refreshPorts = false;
 
 void setup() {
-size(800,650);                     // stage size
-frameRate(60);                     // frame rate
+  size(800,650);                     // stage size
+  frameRate(60);                     // frame rate
   font = loadFont("Arial-BoldMT-36.vlw");
   textFont(font);
   textAlign(CENTER);
   rectMode(CENTER);
   ellipseMode(CENTER);
-beatTime = new int[windowWidth];   // the beatTime array holds IBI graph data
-for(int i=0; i<beatTime.length; i++){
-  beatTime[i] = 300;              // initialize the IBI graph with data line at base
-}
-
-PPG = new int[150];                // PPG array that that prints heartbeat waveform
-for (int i=0; i<=PPG.length-1; i++){
- PPG[i] = height/2+15;             // initialize PPG widow with data line at midpoint
-}
+  
+  beatTime = new int[windowWidth];   // the beatTime array holds IBI graph data
+  PPG = new int[150];                // PPG array that that prints heartbeat waveform
+  // initialze Data traces
+  resetDataTraces();
 
 
 background(0);
@@ -213,4 +209,15 @@ void autoScanPorts(){
    refreshPorts = true;
    return;
  }
+}
+
+void resetDataTraces(){
+  // initialize PPG trace
+  for (int i=0; i<=PPG.length-1; i++){
+   PPG[i] = height/2+15;             // initialize PPG widow with data line at midpoint
+  }
+  // initialize beatTime trace
+  for (int i=beatTime.length-1; i>=0; i--){  // reset the data array to default value
+    beatTime[i] = 1000;
+  }
 }
