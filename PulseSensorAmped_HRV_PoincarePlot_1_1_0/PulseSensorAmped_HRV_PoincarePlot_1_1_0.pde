@@ -42,9 +42,8 @@ frameRate(60);
 beatTimeX = new int[numPoints];    // these two arrays hold the Poincare Plot data
 beatTimeY = new int[numPoints];    // size of numPoints determines number of displayed points
 PPG = new int[150];                // PPG array that that prints heartbeat waveform
-for (int i=0; i<150; i++){
- PPG[i] = height/2+15;             // initialize PPG widow with dataline at midpoint
-}
+// initialize data traces
+resetDataTraces();
 
 font = loadFont("Arial-BoldMT-36.vlw");
 textFont(font);                    // general house-keeping in Processing
@@ -214,3 +213,18 @@ void listAvailablePorts(){
     return;
   }
  }
+
+void resetDataTraces(){
+  // initialize the PPG
+  for (int i=0; i<150; i++){
+   PPG[i] = height/2+15;             // initialize PPG widow with dataline at midpoint
+  }
+  // initialize the poncaire points
+  for (int i=numPoints-1; i>=0; i--){  //
+    beatTimeY[i] = 0;
+    beatTimeX[i] = 0;
+  }
+
+
+
+}

@@ -52,16 +52,10 @@ void keyPressed(){
    case 'S':
      saveFrame("HRV-####.jpg");      // take a shot of that!
      break;
-  // clear the screen when you press 'C'
-   case 'C':
-   case 'c':
-     for (int i=beatTime.length-1; i>=0; i--){  // reset the data array to default value
-        beatTime[i] = 300;
-      }
-     for (int i=0; i<150; i++){                 // reset the frequency plot to default values
-       powerPointX[i] = 625;
-       powerPointY[i] = height - 35;
-     }
+  // clear the screen when you press 'R' or 'r'
+   case 'r':
+   case 'R':
+     resetDataTraces();
      break;
    case 'W':
    case 'w':

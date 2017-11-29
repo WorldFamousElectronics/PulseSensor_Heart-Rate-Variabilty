@@ -52,13 +52,11 @@ void keyPressed(){
      saveFrame("Poincare_####.jpg");      // take a shot of that!
      break;
      // clear the Poincare plot arrays and clear the phase space by pressing C key
-   case 'C':
-   case 'c':
-        for (int i=numPoints-1; i>=0; i--){  //
-           beatTimeY[i] = 0;
-           beatTimeX[i] = 0;
-         }
-      break;
+     // clear the screen when you press 'R' or 'r'
+  case 'r':
+  case 'R':
+    resetDataTraces();
+    break;
      // show a trace of the last 20 points in the time series, or not
     case 'L':
     case 'l':

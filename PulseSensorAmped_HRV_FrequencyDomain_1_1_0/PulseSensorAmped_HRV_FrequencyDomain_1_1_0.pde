@@ -57,21 +57,13 @@ void setup() {
   size(800,650);                     // stage size
   frameRate(60);                     // frame rate
   beatTime = new int[windowWidth];   // the beatTime array holds IBI graph data
-  for(int i=0; i<beatTime.length; i++){
-    beatTime[i] = 300;              // initialize the IBI graph with data line at base
-  }
-
   PPG = new int[150];                // PPG array that that prints heartbeat waveform
-  for (int i=0; i<=PPG.length-1; i++){
-   PPG[i] = height/2+15;             // initialize PPG widow with data line at midpoint
-  }
-
-  powerPointX = new float[150];    // these arrays hold the power spectrum point coordinates
+  powerPointX = new float[150];      // these arrays hold the power spectrum point coordinates
   powerPointY = new float[150];
-  for (int i=0; i<150; i++){       // startup values place the coordinates at the bottom right corner
-    powerPointX[i] = 625;
-    powerPointY[i] = height - 35;
-  }
+
+  // set data traces to default
+  resetDataTraces();
+
 
   font = loadFont("Arial-BoldMT-36.vlw");
   textFont(font);        // general Processing tasks when using text
@@ -283,5 +275,21 @@ void writeAxisLabels(){
     }
     refreshPorts = true;
     return;
+  }
+}
+
+void resetDataTraces(){
+  // reset IBI trace
+  for(int i=0; i<beatTime.length; i++){
+    beatTime[i] = 300;              // initialize the IBI graph with data line at base
+  }
+  // reset PPG trace
+  for (int i=0; i<=PPG.length-1; i++){
+   PPG[i] = height/2+15;             // initialize PPG widow with data line at midpoint
+  }
+  // reset power point coordinates
+  for (int i=0; i<150; i++){       // startup values place the coordinates at the bottom right corner
+    powerPointX[i] = 625;
+    powerPointY[i] = height - 35;
   }
 }
