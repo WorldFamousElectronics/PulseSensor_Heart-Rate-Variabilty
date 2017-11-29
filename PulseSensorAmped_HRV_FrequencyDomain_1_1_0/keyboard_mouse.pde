@@ -53,7 +53,8 @@ void keyPressed(){
      saveFrame("HRV-####.jpg");      // take a shot of that!
      break;
   // clear the screen when you press 'C'
-   case'C':
+   case 'C':
+   case 'c':
      for (int i=beatTime.length-1; i>=0; i--){  // reset the data array to default value
         beatTime[i] = 300;
       }
@@ -63,6 +64,7 @@ void keyPressed(){
      }
      break;
    case 'W':
+   case 'w':
      showWave = !showWave;
      break;
    default:

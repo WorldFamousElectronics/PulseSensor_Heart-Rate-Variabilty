@@ -53,6 +53,7 @@ void keyPressed(){
      break;
      // clear the Poincare plot arrays and clear the phase space by pressing C key
    case 'C':
+   case 'c':
         for (int i=numPoints-1; i>=0; i--){  //
            beatTimeY[i] = 0;
            beatTimeX[i] = 0;
@@ -60,6 +61,7 @@ void keyPressed(){
       break;
      // show a trace of the last 20 points in the time series, or not
     case 'L':
+    case 'l':
         makeLine = !makeLine;
       break;
 
