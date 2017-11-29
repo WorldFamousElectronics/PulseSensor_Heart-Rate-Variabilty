@@ -59,6 +59,7 @@ void keyPressed(){
     break;
      // show a trace of the last 20 points in the time series, or not
     case 'L':
+    case 'l':
         makeLine = !makeLine;
       break;
 

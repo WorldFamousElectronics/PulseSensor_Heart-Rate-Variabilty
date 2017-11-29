@@ -58,6 +58,7 @@ void keyPressed(){
      resetDataTraces();
      break;
    case 'W':
+   case 'w':
      showWave = !showWave;
      break;
    default:
