@@ -237,7 +237,7 @@ if(serialPortFound){
   noStroke();
   fill(128);
   if(newDelta){
-    for(int i=HRVdelta.length-1; i>0; i++){
+    for(int i=HRVdelta.length-1; i>0; i--){
       HRVdelta[i] = HRVdelta[i-1];
     }
     HRVdelta[0] = amp;
@@ -309,8 +309,8 @@ void writeLabels(){
   text("IBI", 40,200);                          // Y axis label
   // text("mS",40,230);
   text("Beats", 75+windowWidth-25, height-10);  // X axis advances 3 pixels with every beat
-  text("Breath Cycle " + breathCycle,breathCenterX,40);
-  text(HRVdelta[0] + " BPM", breathCenterX,height-10);
+  text("Breath Cycle " + breathCycle + "s",breathCenterX,40);
+  text(HRVdelta[0] + " IBI delta", breathCenterX,height-10);
 }
 
 void listAvailablePorts(){
