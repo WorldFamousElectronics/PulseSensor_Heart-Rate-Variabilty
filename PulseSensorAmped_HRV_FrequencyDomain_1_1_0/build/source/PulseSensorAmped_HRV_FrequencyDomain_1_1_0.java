@@ -14,12 +14,12 @@ import java.io.InputStream;
 import java.io.OutputStream; 
 import java.io.IOException; 
 
-public class PulseSensorAmped_HRV_FrequencyDomain_01 extends PApplet {
+public class PulseSensorAmped_HRV_FrequencyDomain_1_1_0 extends PApplet {
 
-/*     PulseSensor Amped HRV Frequency Domain Plot
+/*     PulseSensor Amped HRV Frequency Domain Plotter v1.1.0
 
 This is an HRV visualizer code for Pulse Sensor.  www.pulsesensor.com
-Use this with PulseSensorAmped_Arduino_x.x code and the Pulse Sensor Amped hardware.
+Use this with PulseSensorAmped_Arduino_1.5.0 code and the Pulse Sensor Amped hardware.
 This code will track Heart Rate Variabilty by tracing the changes in IBI values
 over the frequency domain. The code looks for a change in the trend of IBI values,
 up or down, and calculates the frequency using the last peak or trough.
@@ -75,21 +75,13 @@ public void setup() {
                        // stage size
   frameRate(60);                     // frame rate
   beatTime = new int[windowWidth];   // the beatTime array holds IBI graph data
-  for(int i=0; i<beatTime.length; i++){
-    beatTime[i] = 300;              // initialize the IBI graph with data line at base
-  }
-
   PPG = new int[150];                // PPG array that that prints heartbeat waveform
-  for (int i=0; i<=PPG.length-1; i++){
-   PPG[i] = height/2+15;             // initialize PPG widow with data line at midpoint
-  }
-
-  powerPointX = new float[150];    // these arrays hold the power spectrum point coordinates
+  powerPointX = new float[150];      // these arrays hold the power spectrum point coordinates
   powerPointY = new float[150];
-  for (int i=0; i<150; i++){       // startup values place the coordinates at the bottom right corner
-    powerPointX[i] = 625;
-    powerPointY[i] = height - 35;
-  }
+
+  // set data traces to default
+  resetDataTraces();
+
 
   font = loadFont("Arial-BoldMT-36.vlw");
   textFont(font);        // general Processing tasks when using text
@@ -206,7 +198,7 @@ if(showWave){
  noFill();
  stroke(250,0,0);                                       // use red for the pulse wave
   beginShape();                                         // beginShape is a nice way to draw graphs!
-  for (int i=1; i<PPG.length-1; i++){                   // scroll through the PPG array
+  for (int i=1; i<PPG.length; i++){                   // scroll through the PPG array
     float x = width-160+i;
     float y = PPG[i];
     vertex(x,y);                                        // set the vertex coordinates
@@ -235,7 +227,6 @@ public void drawDataWindows(){
   fill(eggshell);
   rect(width/2-50,height/2+15,windowWidth,windowHeight);     // draw IBI data window
   rect(width-85,(height/2)+15,150,550);                      // draw the pulse waveform window
-
 }
 
 public void writeAxisLabels(){
@@ -305,6 +296,22 @@ public void writeAxisLabels(){
   }
 }
 
+public void resetDataTraces(){
+  // reset IBI trace
+  for(int i=0; i<beatTime.length; i++){
+    beatTime[i] = 300;              // initialize the IBI graph with data line at base
+  }
+  // reset PPG trace
+  for (int i=0; i<=PPG.length-1; i++){
+   PPG[i] = height/2+15;             // initialize PPG widow with data line at midpoint
+  }
+  // reset power point coordinates
+  for (int i=0; i<150; i++){       // startup values place the coordinates at the bottom right corner
+    powerPointX[i] = 625;
+    powerPointY[i] = height - 35;
+  }
+}
+
 public void mousePressed(){
   if(!serialPortFound){
     for(int i=0; i<=numPorts; i++){
@@ -358,17 +365,13 @@ public void keyPressed(){
    case 'S':
      saveFrame("HRV-####.jpg");      // take a shot of that!
      break;
-  // clear the screen when you press 'C'
-   case'C':
-     for (int i=beatTime.length-1; i>=0; i--){  // reset the data array to default value
-        beatTime[i] = 300;
-      }
-     for (int i=0; i<150; i++){                 // reset the frequency plot to default values
-       powerPointX[i] = 625;
-       powerPointY[i] = height - 35;
-     }
+  // clear the screen when you press 'R' or 'r'
+   case 'r':
+   case 'R':
+     resetDataTraces();
      break;
    case 'W':
+   case 'w':
      showWave = !showWave;
      break;
    default:
@@ -453,7 +456,7 @@ try{
      }
       // new data enters on the right at pulseY.length-1
       // scale and constrain incoming Pulse Sensor value to fit inside the pulse window
-      PPG[PPG.length-1] = PApplet.parseInt(map(newPPG,50,950,(height/2+15)+225,(height/2+15)-225));
+      PPG[PPG.length-1] = PApplet.parseInt(map(newPPG,0,1023,(height/2+15)+250,(height/2+15)-250));
      return;
    }
 
@@ -476,7 +479,7 @@ try{
 }
   public void settings() {  size(800,650); }
   static public void main(String[] passedArgs) {
-    String[] appletArgs = new String[] { "PulseSensorAmped_HRV_FrequencyDomain_01" };
+    String[] appletArgs = new String[] { "PulseSensorAmped_HRV_FrequencyDomain_1_1_0" };
     if (passedArgs != null) {
       PApplet.main(concat(appletArgs, passedArgs));
     } else {

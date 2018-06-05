@@ -45,7 +45,7 @@ void setup() {
   textAlign(CENTER);
   rectMode(CENTER);
   ellipseMode(CENTER);
-  
+
   beatTime = new int[windowWidth];   // the beatTime array holds IBI graph data
   PPG = new int[150];                // PPG array that that prints heartbeat waveform
   // initialze Data traces

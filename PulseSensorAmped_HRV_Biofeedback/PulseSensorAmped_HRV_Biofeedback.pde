@@ -140,7 +140,7 @@ if(serialPortFound){
       mean = P-amp/2;                  // the average is useful for VLF derivation.......
       newDelta = true;
       T = lastIBI;                     // set the last IBI as the most recent trough cause we're going down
-      lowBPM = 60.0/T;
+      lowBPM = 60000.0/T;
       HRV = highBPM - lowBPM;
     }
 
@@ -152,7 +152,7 @@ if(serialPortFound){
       mean = P-amp/2;                  // the average is useful for VLF derivation.......
       newDelta = true;
       P = lastIBI;                     // set the last IBI as the most recent peak cause we're going up
-      highBPM = 60.0/T;
+      highBPM = 60000.0/P;
       HRV = highBPM - lowBPM;
     }
 
@@ -279,7 +279,8 @@ void writeLabels(){
   // text("mS",40,230);
   text("Beats", 75+windowWidth-25, height-10);  // X axis advances 3 pixels with every beat
   text("Breaths Per Minute " + 60/breathCycle, breathCenterX, 40);
-  text(" HRV " + HRV, breathCenterX,height-10);
+  String hrv = nf(HRV,2,1);
+  text(" HRV " + hrv, breathCenterX,height-10);
 }
 
 void listAvailablePorts(){

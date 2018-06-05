@@ -14,12 +14,12 @@ import java.io.InputStream;
 import java.io.OutputStream; 
 import java.io.IOException; 
 
-public class PulseSensorAmped_HRV_PoincarePlot_02 extends PApplet {
+public class PulseSensorAmped_HRV_PoincarePlot_1_1_0 extends PApplet {
 
-/*     PulseSensor Amped HRV Poincare Plot
+/*     PulseSensor Amped HRV Poincare Plotter v1.1.0
 
 This is an HRV visualizer code for Pulse Sensor.
-Use this with PulseSensorAmped_Arduino_x.x Arduino code and the Pulse Sensor Amped hardware.
+Use this with PulseSensorAmped_Arduino_1.5.0 Arduino code and the Pulse Sensor Amped hardware.
 This code will draw a Poincare Plot of the IBI (InterBeat Interval) passed from Arduino.
 The Poincare method of visualizing HRV trends is to plot the current IBI against the last IBI.
 key press commands included in this version:
@@ -60,9 +60,8 @@ frameRate(60);
 beatTimeX = new int[numPoints];    // these two arrays hold the Poincare Plot data
 beatTimeY = new int[numPoints];    // size of numPoints determines number of displayed points
 PPG = new int[150];                // PPG array that that prints heartbeat waveform
-for (int i=0; i<150; i++){
- PPG[i] = height/2+15;             // initialize PPG widow with dataline at midpoint
-}
+// initialize data traces
+resetDataTraces();
 
 font = loadFont("Arial-BoldMT-36.vlw");
 textFont(font);                    // general house-keeping in Processing
@@ -233,6 +232,21 @@ public void listAvailablePorts(){
   }
  }
 
+public void resetDataTraces(){
+  // initialize the PPG
+  for (int i=0; i<150; i++){
+   PPG[i] = height/2+15;             // initialize PPG widow with dataline at midpoint
+  }
+  // initialize the poncaire points
+  for (int i=numPoints-1; i>=0; i--){  //
+    beatTimeY[i] = 0;
+    beatTimeX[i] = 0;
+  }
+
+
+
+}
+
 public void mousePressed(){
   if(!serialPortFound){
     for(int i=0; i<=numPorts; i++){
@@ -286,14 +300,14 @@ public void keyPressed(){
      saveFrame("Poincare_####.jpg");      // take a shot of that!
      break;
      // clear the Poincare plot arrays and clear the phase space by pressing C key
-   case 'C':
-        for (int i=numPoints-1; i>=0; i--){  //
-           beatTimeY[i] = 0;
-           beatTimeX[i] = 0;
-         }
-      break;
+     // clear the screen when you press 'R' or 'r'
+  case 'r':
+  case 'R':
+    resetDataTraces();
+    break;
      // show a trace of the last 20 points in the time series, or not
     case 'L':
+    case 'l':
         makeLine = !makeLine;
       break;
 
@@ -394,7 +408,7 @@ try{
   public void settings() { 
 size(800,650); }
   static public void main(String[] passedArgs) {
-    String[] appletArgs = new String[] { "PulseSensorAmped_HRV_PoincarePlot_02" };
+    String[] appletArgs = new String[] { "PulseSensorAmped_HRV_PoincarePlot_1_1_0" };
     if (passedArgs != null) {
       PApplet.main(concat(appletArgs, passedArgs));
     } else {

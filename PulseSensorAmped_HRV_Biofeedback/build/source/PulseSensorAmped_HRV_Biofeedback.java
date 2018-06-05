@@ -158,7 +158,7 @@ if(serialPortFound){
       mean = P-amp/2;                  // the average is useful for VLF derivation.......
       newDelta = true;
       T = lastIBI;                     // set the last IBI as the most recent trough cause we're going down
-      lowBPM = 60.0f/T;
+      lowBPM = 60000.0f/T;
       HRV = highBPM - lowBPM;
     }
 
@@ -170,7 +170,7 @@ if(serialPortFound){
       mean = P-amp/2;                  // the average is useful for VLF derivation.......
       newDelta = true;
       P = lastIBI;                     // set the last IBI as the most recent peak cause we're going up
-      highBPM = 60.0f/T;
+      highBPM = 60000.0f/P;
       HRV = highBPM - lowBPM;
     }
 
@@ -291,18 +291,14 @@ public void drawDataWindows(){
 
 public void writeLabels(){
   fill(eggshell);
-  text("Pulse Sensor Breathing Feedback",ibiX,40);              // title
+  text("Pulse Sensor Biofeedback",ibiX,40);     // title
   // fill(200);
   text("IBI", 40,200);                          // Y axis label
   // text("mS",40,230);
   text("Beats", 75+windowWidth-25, height-10);  // X axis advances 3 pixels with every beat
-<<<<<<< HEAD:PulseSensorAmped_HRV_Biofeedback/build/source/PulseSensorAmped_HRV_Biofeedback.java
   text("Breaths Per Minute " + 60/breathCycle, breathCenterX, 40);
-  text(" HRV " + HRV, breathCenterX,height-10);
-=======
-  text("Breath Cycle " + breathCycle + "s",breathCenterX,40);
-  text(HRVdelta[0] + " IBI delta", breathCenterX,height-10);
->>>>>>> 8b5a091f46d0ae829251d2151c4964fddfb3ecae:PulseSensorAmped_HRV_BreathingPrompt/build/source/PulseSensorAmped_HRV_BreathingPrompt.java
+  String hrv = nf(HRV,2,1);
+  text(" HRV " + hrv, breathCenterX,height-10);
 }
 
 public void listAvailablePorts(){
