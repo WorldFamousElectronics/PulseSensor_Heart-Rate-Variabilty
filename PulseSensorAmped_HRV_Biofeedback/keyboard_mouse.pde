@@ -62,31 +62,31 @@ void keyPressed(){
      showWave = !showWave;
      break;
    case '1':
-     breathCycle = 4.0;
+     breathCycle = 60 / 4.0;  // BREATHS PER MINUTE
      break;
    case '2':
-     breathCycle = 4.5;
+     breathCycle = 60 / 4.5;
      break;
    case '3':
-     breathCycle = 5.0;
+     breathCycle = 60 / 5.0;
      break;
    case '4':
-     breathCycle = 5.5;
+     breathCycle = 60 / 5.5;
      break;
    case '5':
-     breathCycle = 6.0;
+     breathCycle = 60 / 6.0;
      break;
    case '6':
-     breathCycle = 6.5;
+     breathCycle = 60 / 6.5;
      break;
    case '7':
-     breathCycle = 7.0;
+     breathCycle = 60 / 7.0;
      break;
    case '8':
-     breathCycle = 7.5;
+     breathCycle = 60 / 7.5;
      break;
    case '9':
-     breathCycle = 8.0;
+     breathCycle = 60 / 8.0;
      break;
    default:
      break;

@@ -1,3 +1,21 @@
+import processing.core.*; 
+import processing.data.*; 
+import processing.event.*; 
+import processing.opengl.*; 
+
+import processing.serial.*; 
+
+import java.util.HashMap; 
+import java.util.ArrayList; 
+import java.io.File; 
+import java.io.BufferedReader; 
+import java.io.PrintWriter; 
+import java.io.InputStream; 
+import java.io.OutputStream; 
+import java.io.IOException; 
+
+public class PulseSensorAmped_HRV_Biofeedback extends PApplet {
+
 /*     PulseSensor Amped HRV Biofeedback v1.1.0
 
 This is an HRV visualizer code for Pulse Sensor.  www.pulsesensor.com
@@ -17,24 +35,24 @@ This code released into the public domain without promises that it will work for
 Or that it will work at all, for that matter. I hereby disclaim.
 */
 
-import processing.serial.*;  // serial library lets us talk to Arduino
+  // serial library lets us talk to Arduino
 PFont font;
 PFont portsFont;
 Serial port;
 
-float freq;               // used to hold derived HRV frequency
+// float freq;               // used to hold derived HRV frequency
 float runningTotal = 1;   // can't initialize as 0 because math
 float mean;               // useful for VLF derivation...........
 int IBI;                  // length of time between heartbeats in milliseconds (sent from Arduino, updated in serialEvent)
 int P;                    // peak value of IBI waveform
 int T;                    // trough value of IBI waveform
+float HRV;
+float lowBPM;
+float highBPM;
 int amp;                  // amplitude of IBI waveform
 int lastIBI;              // value of the last IBI sent from Arduino
 int[] PPG;                // array of raw Pulse Sensor datapoints
 int[] beatTime;           // array of IBI values to graph on Y axis
-float[] powerPointX;      // array of power spectrum power points
-float[] powerPointY;      // used to plot on screen
-int pointCount = 0;       // used to help fill the powerPoint arrays
 int windowWidth = 550;    // width of IBI data window
 int windowHeight = 550;   // height of IBI data window
 int pulseX = 715;         // left edge of rectangle for pulse window
@@ -42,18 +60,18 @@ int ibiX = 350;           // left edge of rectangle for IBI window
 
 int breathCenterX = 995;
 int breathCenterY;
-float breathXmax = 315.0;
-float breathXmin = 35.0;
-float breathYmax = 225.0;
-float breathYmin = 25.0;
+float breathXmax = 315.0f;
+float breathXmin = 35.0f;
+float breathYmax = 225.0f;
+float breathYmin = 25.0f;
 float breathX = breathXmin;
 float breathY = breathYmin;
-float breathXstep = (breathXmax-breathXmin)/180.0;
-float breathYstep = (breathYmax-breathYmin)/180.0;
-float blue = 17.0;
-float red = 180.0; //197;
+float breathXstep = (breathXmax-breathXmin)/180.0f;
+float breathYstep = (breathYmax-breathYmin)/180.0f;
+float blue = 17.0f;
+float red = 180.0f; //197;
 float fadeValue = blue;
-float breathCycle = 6.0;
+float breathCycle = 10.0f;
 
 float HRVdelta[];
 boolean newDelta = false;
@@ -65,7 +83,7 @@ float angle;
 float angleStep;
 int counter = 0;
 
-color eggshell = color(255, 253, 248);
+int eggshell = color(255, 253, 248);
 
 String direction = "none";  // used in verbose feedback
 
@@ -83,8 +101,8 @@ Radio[] button = new Radio[Serial.list().length*2];
 int numPorts = serialPorts.length;
 boolean refreshPorts = false;
 
-void setup() {
-  size(1200,650);                     // stage size
+public void setup() {
+                      // stage size
   frameRate(60);                     // frame rate
   font = loadFont("Arial-BoldMT-36.vlw");
   textFont(font);
@@ -95,13 +113,11 @@ void setup() {
   deltaGraphY = (height/4)*3;
   beatTime = new int[windowWidth];   // the beatTime array holds IBI graph data
   PPG = new int[150];                // PPG array that that prints heartbeat waveform
-  powerPointX = new float[150];      // these arrays hold the power spectrum point coordinates
-  powerPointY = new float[150];
   HRVdelta = new float[32];
   for(int i=0; i<32; i++){
-    HRVdelta[i]= 1.0;
+  HRVdelta[i]= 1.0f;
   }
-  // set data traces to default
+// set data traces to default
   resetDataTraces();
 
 
@@ -118,9 +134,9 @@ drawDataWindows();
 }  // END OF SETUP
 
 
-void draw(){
+public void draw(){
 if(serialPortFound){
-  // ONLY RUN THE VISUALIZER AFTER THE PORT IS CONNECTED
+// ONLY RUN THE VISUALIZER AFTER THE PORT IS CONNECTED
    background(0);
 //  DRAW THE BACKGROUND ELEMENTS AND TEXT
    noStroke();
@@ -137,33 +153,25 @@ if(serialPortFound){
     if (IBI < lastIBI && goingUp == true){  // check for IBI wave peak
       goingUp = false;                 // now changing direction from up to down
       direction = "down";              // used in verbose feedback
-      freq = (runningTotal/1000) *2;   // scale milliseconds to seconds account for 1/2 wave data
-      freq = 1/freq;                   // convert time IBI trending up to Hz
       runningTotal = 0;                // reset this for next time
       amp = P-T;                       // measure the size of the IBI 1/2 wave that just happend
       mean = P-amp/2;                  // the average is useful for VLF derivation.......
       newDelta = true;
       T = lastIBI;                     // set the last IBI as the most recent trough cause we're going down
-      powerPointX[pointCount] = map(freq,0,1.2,75,windowWidth+75);  // plot the frequency
-      powerPointY[pointCount] = height-(35+amp);  // amp determines 'power' of signal
-      pointCount++;                    // build the powerPoint array
-      if(pointCount == 150){pointCount = 0;}      // overflow the powerPoint array
+      lowBPM = 60.0f/T;
+      HRV = highBPM - lowBPM;
     }
 
     if (IBI > lastIBI && goingUp == false){  // check for IBI wave trough
       goingUp = true;                  // now changing direction from down to up
       direction = "up";                // used in verbose feedback
-      freq = (runningTotal/1000) * 2;  // scale milliseconds to seconds, account for 1/2 wave data
-      freq = 1/freq;                   // convert time IBI trending up to Hz
       runningTotal = 0;                // reset this for next time
       amp = P-T;                       // measure the size of the IBI 1/2 wave that just happend
       mean = P-amp/2;                  // the average is useful for VLF derivation.......
       newDelta = true;
       P = lastIBI;                     // set the last IBI as the most recent peak cause we're going up
-      powerPointX[pointCount] = map(freq,0,1.2,75,windowWidth+75);  // plot the frequency
-      powerPointY[pointCount] = height-(35+amp); // amp determines 'power' of signal
-      pointCount++;                    // build the powerPoint array
-      if(pointCount == 150){pointCount = 0;}      // overflow the powerPoint array
+      highBPM = 60.0f/T;
+      HRV = highBPM - lowBPM;
     }
 
     if (IBI < T){                        // T is the trough
@@ -175,7 +183,7 @@ if(serialPortFound){
     lastIBI = IBI;                     // keep track to measure the trend
     runningTotal += IBI;               // how long since IBI wave changed direction?
 
-//  >>> this part is for IBI waveform graphing
+//  UPDATE IBI ARRAY
     for (int i=0; i<beatTime.length-3; i+=3){   // shift the data in beatTime array 3 pixels left
       beatTime[i] = beatTime[i+3];              // shift the data points through the array
     }
@@ -184,21 +192,7 @@ if(serialPortFound){
 
  }
 
-//    DRAW THE SPECTRUM PLOT
-  String F = nf(freq,1,3);  // format the freq variable so it's nice to print
-  fill(128);
-  text(F+"Hz",200,100);     // print the freq variable for verbose feedback
-  // first, make a vertical line at the most recent plot point in red
-  stroke(250,5,180);
-  line(map(freq,0,1.2,75,windowWidth+75),height-35,map(freq,0,1.2,75,windowWidth+75),(height-(35+amp)));
-  stroke(255,0,0);
-  for(int i=0; i<150; i++){
-    ellipse(powerPointX[i],powerPointY[i],2,2);    // plot a history of data points in red
-  }
-
-
-
-  //    DRAW THE IBI PLOT
+//    DRAW THE IBI PLOT
   if(showWave){
     stroke(0,0,255);                                // IBI graph in blue
     noFill();
@@ -216,12 +210,6 @@ if(serialPortFound){
     text("IBI: "+IBI+"mS", pulseX-25,50); // )-85,50);             // print latest IBI value above pulse wave window
     noFill();
 
-
-  //   GRAPH THE LIVE PULSE SENSOR DATA
-  // stroke(250,0,0);                         // use red for the pulse wave
-  // for (int i=1; i<PPG.length-1; i++){      // draw the waveform shape
-  //   line(width-160+i,PPG[i],width-160+(i-1),PPG[i-1]);
-  // }
    //   GRAPH THE PULSE SENSOR DATA
    stroke(250,0,0);                                       // use red for the pulse wave
     beginShape();                                         // beginShape is a nice way to draw graphs!
@@ -233,14 +221,14 @@ if(serialPortFound){
     endShape();
   }
 
-  // GRAPH THE HRV DELTA IN BPM
+// GRAPH THE HRV DELTA
   noStroke();
   fill(128);
   if(newDelta){
     for(int i=HRVdelta.length-1; i>0; i++){
       HRVdelta[i] = HRVdelta[i-1];
     }
-    HRVdelta[0] = amp;
+    HRVdelta[0] = HRV;
     newDelta = false;
   }
   int deltaCounter = 0;
@@ -256,7 +244,6 @@ if(serialPortFound){
     if(refreshPorts){
       refreshPorts = false;
       drawDataWindows();
-  //    drawHeart();
       listAvailablePorts();
     }
 
@@ -265,8 +252,8 @@ if(serialPortFound){
       button[i].displayRadio();
     }
   }
-       // breathing prompt
-  angle = radians(((millis()/1000.0)/breathCycle)*360);
+       // DRAW THE BREATH PROMPT
+  angle = radians(((millis()/1000.0f)/breathCycle)*360);
   breathX = 35 + (sin(angle) * breathXmax/2) + breathXmax/2;
   breathY = 25 + (sin(angle) * breathYmax/2) + breathYmax/2;
   fadeValue = blue + (sin(angle) * red/2) + red/2;
@@ -277,7 +264,7 @@ if(serialPortFound){
 }  //end of draw loop
 
 
-void drawDataWindows(){
+public void drawDataWindows(){
   noStroke();
   fill(eggshell);                                        // eggshell white
   rect(ibiX,height/2+15,windowWidth,windowHeight);       // draw IBI data window
@@ -302,18 +289,18 @@ void drawDataWindows(){
   noStroke();
 }
 
-void writeLabels(){
+public void writeLabels(){
   fill(eggshell);
   text("Pulse Sensor Breathing Feedback",ibiX,40);              // title
   // fill(200);
   text("IBI", 40,200);                          // Y axis label
   // text("mS",40,230);
   text("Beats", 75+windowWidth-25, height-10);  // X axis advances 3 pixels with every beat
-  text("Breath Cycle " + breathCycle,breathCenterX,40);
-  text(HRVdelta[0] + " BPM", breathCenterX,height-10);
+  text("Breaths Per Minute " + 60/breathCycle, breathCenterX, 40);
+  text(" HRV " + HRV, breathCenterX,height-10);
 }
 
-void listAvailablePorts(){
+public void listAvailablePorts(){
   println(Serial.list());    // print a list of available serial ports to the console
   serialPorts = Serial.list();
   fill(0);
@@ -339,7 +326,7 @@ void listAvailablePorts(){
   textAlign(CENTER);
 }
 
-void autoScanPorts(){
+public void autoScanPorts(){
  if(Serial.list().length != numPorts){
    if(Serial.list().length > numPorts){
      println("New Ports Opened!");
@@ -355,7 +342,7 @@ void autoScanPorts(){
  }
 }
 
-void resetDataTraces(){
+public void resetDataTraces(){
   // reset IBI trace
   for(int i=0; i<beatTime.length; i++){
     beatTime[i] = 750;              // initialize the IBI graph with data line at midpoint
@@ -364,9 +351,207 @@ void resetDataTraces(){
   for (int i=0; i<=PPG.length-1; i++){
    PPG[i] = height/2+15;             // initialize PPG widow with data line at midpoint
   }
-  // reset power point coordinates
-  for (int i=0; i<150; i++){       // startup values place the coordinates at the bottom right corner
-    powerPointX[i] = 625;
-    powerPointY[i] = height - 35;
+}
+
+public void mousePressed(){
+  if(!serialPortFound){
+    for(int i=0; i<=numPorts; i++){
+      if(button[i].pressRadio(mouseX,mouseY)){
+        if(i == numPorts){
+          if(Serial.list().length > numPorts){
+            println("New Ports Opened!");
+            int diff = Serial.list().length - numPorts;	// was serialPorts.length
+            serialPorts = expand(serialPorts,diff);
+            //button = (Radio[]) expand(button,diff);
+            numPorts = Serial.list().length;
+          }else if(Serial.list().length < numPorts){
+            println("Some Ports Closed!");
+            numPorts = Serial.list().length;
+          }else if(Serial.list().length == numPorts){
+            return;
+          }
+          refreshPorts = true;
+          return;
+        }else
+
+        try{
+          port = new Serial(this, Serial.list()[i], 115200);  // make sure Arduino is talking serial at this baud rate
+          delay(1000);
+          println(port.read());
+          port.clear();            // flush buffer
+          port.bufferUntil('\n');  // set buffer full flag on receipt of carriage return
+          serialPortFound = true;
+        }
+        catch(Exception e){
+          println("Couldn't open port " + Serial.list()[i]);
+          fill(255,0,0);
+          textFont(font,16);
+          textAlign(LEFT);
+          text("Couldn't open port " + Serial.list()[i],165,90);
+          textFont(font);
+          textAlign(CENTER);
+        }
+      }
+    }
+  }
+}
+
+public void mouseReleased(){
+}
+
+public void keyPressed(){
+
+ switch(key){
+   case 's':    // pressing 's' or 'S' will take a jpg of the processing window
+   case 'S':
+     saveFrame("HRV-####.jpg");      // take a shot of that!
+     break;
+  // clear the screen when you press 'R' or 'r'
+   case 'r':
+   case 'R':
+     resetDataTraces();
+     break;
+   case 'W':
+   case 'w':
+     showWave = !showWave;
+     break;
+   case '1':
+     breathCycle = 60 / 4.0f;  // BREATHS PER MINUTE
+     break;
+   case '2':
+     breathCycle = 60 / 4.5f;
+     break;
+   case '3':
+     breathCycle = 60 / 5.0f;
+     break;
+   case '4':
+     breathCycle = 60 / 5.5f;
+     break;
+   case '5':
+     breathCycle = 60 / 6.0f;
+     break;
+   case '6':
+     breathCycle = 60 / 6.5f;
+     break;
+   case '7':
+     breathCycle = 60 / 7.0f;
+     break;
+   case '8':
+     breathCycle = 60 / 7.5f;
+     break;
+   case '9':
+     breathCycle = 60 / 8.0f;
+     break;
+   default:
+     break;
+ }
+}
+
+
+class Radio {
+  int _x,_y;
+  int size, dotSize;
+  int baseColor, overColor, pressedColor;
+  boolean over, pressed;
+  int me;
+  Radio[] radios;
+
+  Radio(int xp, int yp, int s, int b, int o, int p, int m, Radio[] r) {
+    _x = xp;
+    _y = yp;
+    size = s;
+    dotSize = size - size/3;
+    baseColor = b;
+    overColor = o;
+    pressedColor = p;
+    radios = r;
+    me = m;
+  }
+
+  public boolean pressRadio(float mx, float my){
+    if (dist(_x, _y, mx, my) < size/2){
+      pressed = true;
+      for(int i=0; i<numPorts+1; i++){
+        if(i != me){ radios[i].pressed = false; }
+      }
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  public boolean overRadio(float mx, float my){
+    if (dist(_x, _y, mx, my) < size/2){
+      over = true;
+      for(int i=0; i<numPorts+1; i++){
+        if(i != me){ radios[i].over = false; }
+      }
+      return true;
+    } else {
+      over = false;
+      return false;
+    }
+  }
+
+  public void displayRadio(){
+    noStroke();
+    fill(baseColor);
+    ellipse(_x,_y,size,size);
+    if(over){
+      fill(overColor);
+      ellipse(_x,_y,dotSize,dotSize);
+    }
+    if(pressed){
+      fill(pressedColor);
+      ellipse(_x,_y,dotSize,dotSize);
+    }
+  }
+}
+
+
+
+
+public void serialEvent(Serial port){
+try{
+   String inData = port.readStringUntil('\n');  // read the ascii data into a String
+   inData = trim(inData);                 // cut off white space (carriage return)
+
+  if (inData.charAt(0) == 'S'){           // leading 'S' means Pulse Sensor data packet
+     inData = inData.substring(1);        // cut off the leading 'S'
+     int newPPG = PApplet.parseInt(inData);            // convert ascii string to integer
+     for (int i = 0; i < PPG.length-1; i++){
+       PPG[i] = PPG[i+1]; // move the Y coordinates of the pulse wave one pixel left
+     }
+      // new data enters on the right at pulseY.length-1
+      // scale and constrain incoming Pulse Sensor value to fit inside the pulse window
+      PPG[PPG.length-1] = PApplet.parseInt(map(newPPG,50,950,(height/2+15)+225,(height/2+15)-225));
+     return;
+   }
+
+    if (inData.charAt(0) == 'Q'){         // leading 'Q' means IBI data packet
+     inData = inData.substring(1);        // cut off the leading 'Q'
+     IBI = PApplet.parseInt(inData);                   // convert ascii string to integer
+     pulse = true;                        // set the pulse flag
+     if (first){                          // if it's the first time, prime these variables
+       lastIBI = IBI;
+       P = IBI;
+       T = IBI;
+       first = false;
+     }
+     return;
+    }
+}catch(Exception e) {
+   //println(e.toString());
+}
+
+}
+  public void settings() {  size(1200,650); }
+  static public void main(String[] passedArgs) {
+    String[] appletArgs = new String[] { "PulseSensorAmped_HRV_Biofeedback" };
+    if (passedArgs != null) {
+      PApplet.main(concat(appletArgs, passedArgs));
+    } else {
+      PApplet.main(appletArgs);
+    }
   }
 }
