@@ -225,7 +225,7 @@ if(serialPortFound){
   noStroke();
   fill(128);
   if(newDelta){
-    for(int i=HRVdelta.length-1; i>0; i++){
+    for(int i=HRVdelta.length-1; i>0; i--){
       HRVdelta[i] = HRVdelta[i-1];
     }
     HRVdelta[0] = HRV;
@@ -296,8 +296,13 @@ public void writeLabels(){
   text("IBI", 40,200);                          // Y axis label
   // text("mS",40,230);
   text("Beats", 75+windowWidth-25, height-10);  // X axis advances 3 pixels with every beat
+<<<<<<< HEAD:PulseSensorAmped_HRV_Biofeedback/build/source/PulseSensorAmped_HRV_Biofeedback.java
   text("Breaths Per Minute " + 60/breathCycle, breathCenterX, 40);
   text(" HRV " + HRV, breathCenterX,height-10);
+=======
+  text("Breath Cycle " + breathCycle + "s",breathCenterX,40);
+  text(HRVdelta[0] + " IBI delta", breathCenterX,height-10);
+>>>>>>> 8b5a091f46d0ae829251d2151c4964fddfb3ecae:PulseSensorAmped_HRV_BreathingPrompt/build/source/PulseSensorAmped_HRV_BreathingPrompt.java
 }
 
 public void listAvailablePorts(){

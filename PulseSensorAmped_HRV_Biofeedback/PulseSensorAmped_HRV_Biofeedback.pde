@@ -207,7 +207,7 @@ if(serialPortFound){
   noStroke();
   fill(128);
   if(newDelta){
-    for(int i=HRVdelta.length-1; i>0; i++){
+    for(int i=HRVdelta.length-1; i>0; i--){
       HRVdelta[i] = HRVdelta[i-1];
     }
     HRVdelta[0] = HRV;
