@@ -14,12 +14,12 @@ import java.io.InputStream;
 import java.io.OutputStream; 
 import java.io.IOException; 
 
-public class PulseSensorAmped_HRV_TimeDomain_01 extends PApplet {
+public class PulseSensorAmped_HRV_TimeDomain_1_1_0 extends PApplet {
 
-/*     PulseSensor Amped HRV Time Domain Plot
+/*     PulseSensor Amped HRV Time Domain Plotter v1.1.0
 
 This is an HRV visualizer code for Pulse Sensor.  www.pulsesensor.com
-Use this with PulseSensorAmped_Arduino_x.x code and the Pulse Sensor Amped hardware.
+Use this with PulseSensorAmped_Arduino_1.5.0 code and the Pulse Sensor Amped hardware.
 This code will draw a line graph of the IBI (InterBeat Interval) over time as it is passed from Arduino.
 The IBI plot is updated and the graph advances 3 pixels every heart beat.
 key press commands included in this version:
@@ -56,22 +56,18 @@ int numPorts = serialPorts.length;
 boolean refreshPorts = false;
 
 public void setup() {
-                     // stage size
-frameRate(60);                     // frame rate
+                       // stage size
+  frameRate(60);                     // frame rate
   font = loadFont("Arial-BoldMT-36.vlw");
   textFont(font);
   textAlign(CENTER);
   rectMode(CENTER);
   ellipseMode(CENTER);
-beatTime = new int[windowWidth];   // the beatTime array holds IBI graph data
-for(int i=0; i<beatTime.length; i++){
-  beatTime[i] = 300;              // initialize the IBI graph with data line at base
-}
 
-PPG = new int[150];                // PPG array that that prints heartbeat waveform
-for (int i=0; i<=PPG.length-1; i++){
- PPG[i] = height/2+15;             // initialize PPG widow with data line at midpoint
-}
+  beatTime = new int[windowWidth];   // the beatTime array holds IBI graph data
+  PPG = new int[150];                // PPG array that that prints heartbeat waveform
+  // initialze Data traces
+  resetDataTraces();
 
 
 background(0);
@@ -233,6 +229,17 @@ public void autoScanPorts(){
  }
 }
 
+public void resetDataTraces(){
+  // initialize PPG trace
+  for (int i=0; i<=PPG.length-1; i++){
+   PPG[i] = height/2+15;             // initialize PPG widow with data line at midpoint
+  }
+  // initialize beatTime trace
+  for (int i=beatTime.length-1; i>=0; i--){  // reset the data array to default value
+    beatTime[i] = 1000;
+  }
+}
+
 public void mousePressed(){
   if(!serialPortFound){
     for(int i=0; i<=numPorts; i++){
@@ -286,12 +293,11 @@ public void keyPressed(){
    case 'S':
      saveFrame("HRV-####.jpg");      // take a shot of that!
      break;
- // clear the IBI data array by pressing c key
-  case 'C':
-    for (int i=beatTime.length-1; i>=0; i--){  // reset the data array to default value
-       beatTime[i] = 1000;
-     }
-     break;
+ // clear the screen when you press 'R' or 'r'
+  case 'r':
+  case 'R':
+    resetDataTraces();
+    break;
    default:
      break;
  }
@@ -388,10 +394,9 @@ try{
    //println(e.toString());
 }
 }// END OF SERIAL EVENT
-  public void settings() { 
-size(800,650); }
+  public void settings() {  size(800,650); }
   static public void main(String[] passedArgs) {
-    String[] appletArgs = new String[] { "PulseSensorAmped_HRV_TimeDomain_01" };
+    String[] appletArgs = new String[] { "PulseSensorAmped_HRV_TimeDomain_1_1_0" };
     if (passedArgs != null) {
       PApplet.main(concat(appletArgs, passedArgs));
     } else {
