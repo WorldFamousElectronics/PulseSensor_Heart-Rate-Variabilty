@@ -9,7 +9,7 @@ These sketches work with Arduino running PulseSensor BPM code and plugged into P
 
 A thorough description of HRV and explication of these sketches are here
 
-*	http://pulsesensor.com/pages/hrv-poincare-plot
+*	 http://pulsesensor.com/pages/hrv-poincare-plot
 
 *  http://pulsesensor.com/pages/hrv-time-domain
 

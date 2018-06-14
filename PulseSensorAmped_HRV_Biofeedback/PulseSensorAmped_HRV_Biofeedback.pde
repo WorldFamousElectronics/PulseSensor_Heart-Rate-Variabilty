@@ -1,11 +1,13 @@
 /*     PulseSensor Amped HRV Biofeedback v1.1.0
 
 This is an HRV visualizer code for Pulse Sensor.  www.pulsesensor.com
-Use this with PulseSensorAmped_Arduino_1.5.0 code and the Pulse Sensor Amped hardware.
-This code will track Heart Rate Variabilty by tracing the changes in IBI values
-over the frequency domain. The code looks for a change in the trend of IBI values,
-up or down, and calculates the frequency using the last peak or trough.
-Thus deriving the IBI frequency based on 1/2 wave data.
+Use this with PulseSensor_BPM Arduino code and the Pulse Sensor Amped hardware.
+This code will track Heart Rate Variabilty by tracing the changes in BPM values
+The code looks for a change in the trend of BPM values,
+up or down, and calculates the HRV using the last peak or trough.
+HRV, measured in the difference in BPM is also graphed.
+There is also a breathing prompt that helps you breath at a specific breaths per minute.
+
 
 key press commands included in this version:
   press 'S' to take a picture of the data window. (JPG image saved in Sketch folder)
@@ -29,6 +31,7 @@ int IBI;                  // length of time between heartbeats in milliseconds (
 int P;                    // peak value of IBI waveform
 int T;                    // trough value of IBI waveform
 float HRV;
+float BPM;
 float lowBPM;
 float highBPM;
 int amp;                  // amplitude of IBI waveform
@@ -97,7 +100,7 @@ void setup() {
   PPG = new int[150];                // PPG array that that prints heartbeat waveform
   HRVdelta = new float[32];
   for(int i=0; i<32; i++){
-  HRVdelta[i]= 1.0;
+    HRVdelta[i]= 1.0;
   }
 // set data traces to default
   resetDataTraces();
@@ -157,10 +160,10 @@ if(serialPortFound){
     }
 
     if (IBI < T){                        // T is the trough
-      T = IBI;                         // keep track of lowest point in pulse wave
+      T = IBI;                           // keep track of lowest point in pulse wave
     }
     if (IBI > P){                        // P is the trough
-      P = IBI;                         // keep track of highest point in pulse wave
+      P = IBI;                           // keep track of highest point in pulse wave
     }
     lastIBI = IBI;                     // keep track to measure the trend
     runningTotal += IBI;               // how long since IBI wave changed direction?
@@ -169,27 +172,28 @@ if(serialPortFound){
     for (int i=0; i<beatTime.length-3; i+=3){   // shift the data in beatTime array 3 pixels left
       beatTime[i] = beatTime[i+3];              // shift the data points through the array
     }
-      IBI = constrain(IBI,300,1200);            // don't let the new IBI value escape the data window!
-      beatTime[beatTime.length-1] = IBI;        // update the current IBI
+    BPM = 60000.0/IBI;
+    BPM = constrain(BPM,20,150);                   // don't let the new IBI value escape the data window!
+    beatTime[beatTime.length-1] = int(BPM);        // update the current IBI
 
  }
 
-//    DRAW THE IBI PLOT
+//    DRAW THE BPM PLOT
   if(showWave){
     stroke(0,0,255);                                // IBI graph in blue
     noFill();
     beginShape();                                   // use beginShape to draw the graph
     for (int i=0; i<=beatTime.length-1; i+=3){      // set a datapoint every three pixels
-      float  y = map(beatTime[i],300,1200,615,65);  // invert and scale data so it looks normal
+      float  y = map(beatTime[i],30,150,615,65);    // invert and scale data so it looks normal
       vertex(i+75,y);                               // set the vertex coordinates
     }
     endShape();                                     // connect the vertices
     noStroke();
     fill(250,0,0);                                  // draw the current data point as a red dot for fun
-    float  y = map(beatTime[beatTime.length-1],300,1200,615,65);  // invert and scale data so it looks normal
+    float  y = map(beatTime[beatTime.length-1],30,150,615,65);  // invert and scale data so it looks normal
     ellipse(windowWidth+75,y,6,6);                  // draw latest data point as a red dot
     fill(255,253,248);                              // eggshell white
-    text("IBI: "+IBI+"mS", pulseX-25,50); // )-85,50);             // print latest IBI value above pulse wave window
+    text("BPM: "+int(BPM), pulseX,50);              // print latest IBI value above pulse wave window
     noFill();
 
    //   GRAPH THE PULSE SENSOR DATA
@@ -215,7 +219,9 @@ if(serialPortFound){
   }
   int deltaCounter = 0;
   for(int i=0; i<deltaGraphHeight; i+=8){
-    rect(breathCenterX,(deltaGraphY+deltaGraphHeight/2)-i-4,HRVdelta[deltaCounter],8);
+    stroke(0);
+    rect(breathCenterX,(deltaGraphY+deltaGraphHeight/2)-i-4,HRVdelta[deltaCounter]*4,8);
+    noStroke();
     deltaCounter++;
   }
 
@@ -255,15 +261,15 @@ void drawDataWindows(){
   rect(breathCenterX,deltaGraphY,380,deltaGraphHeight);                // amplitiude graph
 
   fill(200);                                                 // print scale values in grey
-  for (int i=300; i<=1200; i+=450){                          // print Y axis scale values
-    text(i, 40,map(i,300,1200,615,75));
+  for (int i=30; i<=150; i+=30){                          // print Y axis scale values
+    text(i, 40,map(i,30,150,615,75));
   }
   for (int i=30; i<=180; i+=30){                             // print X axis scale values
     text(i, map(i,180,0,75,windowWidth+75),height-10);
   }
   stroke(200,10,250);                       // draw Y gridlines in purple, for fun
-  for (int i=300; i<=1200; i+=100){         // draw Y axis lines with 100mS resolution
-    line(75,map(i,300,1200,614,66),85,map(i,300,1200,614,66)); //grid the Y axis
+  for (int i=30; i<=150; i+=30){            // draw Y axis lines with 100mS resolution
+    line(75,map(i,30,150,614,74),85,map(i,30,150,614,74)); //grid the Y axis
   }
   for (int i=0; i<=180; i+=10){             // draw X axis lines with 10 beat resolution
     line(map(i,0,180,625,75),height-35,map(i,0,180,625,75),height-45); // grid the X axis
@@ -275,7 +281,7 @@ void writeLabels(){
   fill(eggshell);
   text("Pulse Sensor Biofeedback",ibiX,40);     // title
   // fill(200);
-  text("IBI", 40,200);                          // Y axis label
+  text("BPM", 40,150);                          // Y axis label
   // text("mS",40,230);
   text("Beats", 75+windowWidth-25, height-10);  // X axis advances 3 pixels with every beat
   text("Breaths Per Minute " + 60/breathCycle, breathCenterX, 40);
@@ -328,10 +334,14 @@ void autoScanPorts(){
 void resetDataTraces(){
   // reset IBI trace
   for(int i=0; i<beatTime.length; i++){
-    beatTime[i] = 750;              // initialize the IBI graph with data line at midpoint
+    beatTime[i] = 90;              // initialize the BPM graph with data line at midpoint
   }
   // reset PPG trace
   for (int i=0; i<=PPG.length-1; i++){
    PPG[i] = height/2+15;             // initialize PPG widow with data line at midpoint
+  }
+  // reset HRV graph
+  for(int i=0; i<HRVdelta.length-1; i++){
+    HRVdelta[i] = 1.0;
   }
 }

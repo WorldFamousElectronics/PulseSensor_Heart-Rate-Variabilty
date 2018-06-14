@@ -16,6 +16,7 @@ try{
      return;
    }
 
+
     if (inData.charAt(0) == 'Q'){         // leading 'Q' means IBI data packet
      inData = inData.substring(1);        // cut off the leading 'Q'
      IBI = int(inData);                   // convert ascii string to integer
